@@ -1,11 +1,15 @@
 import Vapor
 
-func routes(_ app: Application) throws {
-    app.get { req async in
-        "It works!"
-    }
+let digitalNZAPIDataSource = DigitalNZAPIDataSource()
 
-    app.get("hello") { req async -> String in
-        "Hello, world!"
+func routes(_ app: Application) throws {
+    app.get { req async throws -> NZRecordsResult in
+        do {
+            let result = try await digitalNZAPIDataSource.newResult()
+            return result
+        }
+        catch {
+            throw Abort(.internalServerError)
+        }
     }
 }
