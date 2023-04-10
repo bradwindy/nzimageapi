@@ -1,6 +1,6 @@
 //
 //  ValidatedRequest.swift
-//  
+//
 //
 //  Created by Bradley Windybank on 26/03/23.
 //
@@ -8,10 +8,10 @@
 import Alamofire
 import Foundation
 
-class ValidatedRequest {
-    static func makeRequest<ResponseType: Decodable>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
+class ValidatedRequestManager: RequestManager {
+    func makeRequest<ResponseType: Decodable>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
         var headers: HTTPHeaders? = nil
-        
+
         if let apiKey {
             headers = HTTPHeaders(["Authentication-Token": apiKey])
         }
