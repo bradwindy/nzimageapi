@@ -10,7 +10,7 @@ import OrderedCollections
 
 class DigitalNZAPIDataSource {
     func newResult() async throws -> NZRecordsResult {
-        let collection = weightedRandomCollectionPick()
+        let collection = self.collectionWeights.weightedRandomPick()
         let secondRequestResultsPerPage = 100
         let endpoint = "https://api.digitalnz.org/records.json"
         
@@ -51,21 +51,6 @@ class DigitalNZAPIDataSource {
     
     enum DigitalNZAPIDataSourceError: Error {
         case noResults
-    }
-    
-    private func weightedRandomCollectionPick() -> String {
-        let randomFloatThreshold = Double.random(in: 0..<1)
-        var totalCombinedWeights: Double = 0
-        
-        for position in 0 ..< collectionWeights.count {
-            totalCombinedWeights += collectionWeights.elements[position].value
-            
-            if totalCombinedWeights > randomFloatThreshold {
-                return collectionWeights.elements[position].key
-            }
-        }
-        
-        return collectionWeights.elements[collectionWeights.count - 1].key
     }
 
     private let collectionWeights: OrderedDictionary = ["Auckland Libraries Heritage Images Collection": 0.1546,
