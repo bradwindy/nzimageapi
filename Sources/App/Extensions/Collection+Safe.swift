@@ -7,8 +7,11 @@
 
 import Foundation
 
-enum CollectionError: Error {
-    case indexOutOfBounds(index: Int, count: Int)
+/// Error thrown by `Collection.throwingAccess(_ index: Index)` if the index is out of bounds.
+struct CollectionIndexOutOfBoundsError: Error {
+    let index: Int
+    let count: Int
+    let collection: any Collection
 }
 
 extension Collection {
@@ -23,7 +26,7 @@ extension Collection {
             return self[index]
         }
         else {
-            throw CollectionError.indexOutOfBounds(index: self.distance(from: self.startIndex, to: index), count: self.count)
+            throw CollectionIndexOutOfBoundsError(index: self.distance(from: self.startIndex, to: index), count: self.count, collection: self)
         }
     }
 }
