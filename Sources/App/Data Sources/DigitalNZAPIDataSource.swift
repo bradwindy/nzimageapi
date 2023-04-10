@@ -62,7 +62,10 @@ class DigitalNZAPIDataSource {
 
         let chosenResultPosition = Int.random(in: 0 ..< secondRequestResultsPerPage)
 
-        return try validatedSearch.results!.throwingAccess(chosenResultPosition).checkHasTitleAndImage()
+        return try validatedSearch
+            .results!
+            .throwingAccess(chosenResultPosition)
+            .checkHasTitleAndLargeImage()
     }
 
     // MARK: Private

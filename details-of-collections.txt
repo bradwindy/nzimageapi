@@ -12,23 +12,23 @@ Filtered to collections with images, that have more than 100 items
 - Status: ✅
 - Image URLs do not currently work, could enquire with council
 - BUT, I can append URL as a URL encoded query item to the url, lmao: https://thumbnailer.digitalnz.org/?format=jpeg&src=
-- CHECK WHICH URL
+- Thumbnail URL to use: Large
 
 "Auckland Museum Collections": 151203,
 - Status: ✅
 - Needs end of url removed
-- CHECK WHICH URL
+- Thumbnail URL to use: Large
 
 "Te Papa Collections Online": 111246,
 - Status: ✅
 - /preview swapped to /full
-- CHECK WHICH URL
+- Thumbnail URL to use: Large
 
 "Kura Heritage Collections Online": 108147,
 - Status: ✅
 - URL looks like: https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/<AKL_LIB_ID>/default.jpg
 - But we need to take <AKL_LIB_ID> and pass it to: https://kura.aucklandlibraries.govt.nz/iiif/2/photos:<AKL_LIB_ID>/full/2048,/0/default.jpg
-- CHECK WHICH URL
+- Thumbnail URL to use: Large
 
 "Anthropology Photographic Archive": 45865,
 - Status: ❌

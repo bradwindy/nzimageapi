@@ -50,8 +50,8 @@ struct NZRecordsResult: Decodable, Content {
         }
     }
     
-    func checkHasTitleAndImage() throws -> NZRecordsResult {
-        if id != nil, title != nil, thumbnailUrl != nil, largeThumbnailUrl != nil {
+    func checkHasTitleAndLargeImage() throws -> NZRecordsResult {
+        if id != nil, title != nil, largeThumbnailUrl != nil {
             return self
         }
         else {
