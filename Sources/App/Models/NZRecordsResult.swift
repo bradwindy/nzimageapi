@@ -8,15 +8,8 @@
 import Foundation
 import Vapor
 
-import Foundation
-
-struct NZRecordsResult: Decodable, Content {
-    var id: Int?
-    var title: String?
-    var description: String?
-    var thumbnailUrl: URL?
-    var largeThumbnailUrl: URL?
-    var collection: String?
+struct NZRecordsResult: NonNullableResult, Content {
+    // MARK: Lifecycle
 
     init(id: Int?, title: String?, description: String?, thumbnailUrl: URL?, largeThumbnailUrl: URL?, collection: String?) {
         self.id = id
@@ -27,6 +20,22 @@ struct NZRecordsResult: Decodable, Content {
         self.collection = collection
     }
 
+    // MARK: Internal
+
+    typealias ErrorType = NZRecordsResultError
+
+    struct NZRecordsResultError: NonNullableError {
+        enum NZRecordsResultErrorKind {
+            case nullResultContent
+            case nullImageOrTitle
+        }
+
+        typealias ErrorKind = NZRecordsResultErrorKind
+
+        var result: any NonNullableResult
+        var kind: NZRecordsResultErrorKind
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -35,27 +44,29 @@ struct NZRecordsResult: Decodable, Content {
         case largeThumbnailUrl = "large_thumbnail_url"
         case collection = "display_collection"
     }
-    
-    enum NZRecordsResultError: Error {
-        case nullResultContent
-        case nullImageOrTitle
-    }
-    
+
+    var id: Int?
+    var title: String?
+    var description: String?
+    var thumbnailUrl: URL?
+    var largeThumbnailUrl: URL?
+    var collection: String?
+
     func checkNonNull() throws -> NZRecordsResult {
         if id != nil, title != nil, description != nil, thumbnailUrl != nil, largeThumbnailUrl != nil {
             return self
         }
         else {
-            throw NZRecordsResultError.nullResultContent
+            throw NZRecordsResultError(result: self, kind: .nullResultContent)
         }
     }
-    
+
     func checkHasTitleAndLargeImage() throws -> NZRecordsResult {
         if id != nil, title != nil, largeThumbnailUrl != nil {
             return self
         }
         else {
-            throw NZRecordsResultError.nullImageOrTitle
+            throw NZRecordsResultError(result: self, kind: .nullImageOrTitle)
         }
     }
 }

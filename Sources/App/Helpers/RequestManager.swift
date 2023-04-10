@@ -8,5 +8,5 @@
 import Foundation
 
 protocol RequestManager {
-    func makeRequest<ResponseType: Decodable>(endpoint: String, apiKey: String?, parameters: [String: Any]?) async throws -> ResponseType
+    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String?, parameters: [String: Any]?) async throws -> ResponseType
 }

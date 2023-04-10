@@ -9,7 +9,7 @@ import Alamofire
 import Foundation
 
 class ValidatedRequestManager: RequestManager {
-    func makeRequest<ResponseType: Decodable>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
+    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
         var headers: HTTPHeaders? = nil
 
         if let apiKey {

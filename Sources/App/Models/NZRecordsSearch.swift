@@ -7,13 +7,25 @@
 
 import Foundation
 
-struct NZRecordsSearch: Decodable {
-    var resultCount: Int?
-    var results: [NZRecordsResult]?
+struct NZRecordsSearch: NonNullableResult, Decodable {
+    // MARK: Lifecycle
 
     init(resultCount: Int?, results: [NZRecordsResult]?) {
         self.resultCount = resultCount
         self.results = results
+    }
+
+    // MARK: Internal
+
+    typealias ErrorType = NZRecordsSearchError
+
+    struct NZRecordsSearchError: NonNullableError {
+        enum NZRecordsSearchErrorKind {
+            case nullSearchContent
+        }
+
+        let result: any NonNullableResult
+        let kind: NZRecordsSearchErrorKind
     }
 
     enum CodingKeys: String, CodingKey {
@@ -21,16 +33,15 @@ struct NZRecordsSearch: Decodable {
         case results
     }
 
-    func checkNonNull() throws -> NZRecordsSearch {
-        enum NZRecordsSearchError: Error {
-            case nullSearchContent
-        }
+    var resultCount: Int?
+    var results: [NZRecordsResult]?
 
+    func checkNonNull() throws -> NZRecordsSearch {
         if resultCount != nil, results != nil {
             return self
         }
         else {
-            throw NZRecordsSearchError.nullSearchContent
+            throw NZRecordsSearchError(result: self, kind: .nullSearchContent)
         }
     }
 }
