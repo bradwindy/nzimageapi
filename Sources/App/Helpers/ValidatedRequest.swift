@@ -8,8 +8,8 @@
 import Alamofire
 import Foundation
 
-class ValidatedRequestManager: RequestManager {
-    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
+class NetworkRequestManager: ValidatedRequestManager {
+    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil, validation: @escaping (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error>) async throws -> ResponseType {
         var headers: HTTPHeaders? = nil
 
         if let apiKey {
@@ -19,8 +19,7 @@ class ValidatedRequestManager: RequestManager {
         let request = AF.request(endpoint, parameters: parameters, headers: headers)
 
         let result = await request
-            .validate(statusCode: 200 ..< 300)
-            .validate(contentType: ["application/json"])
+            .validate(validation)
             .serializingDecodable(ResponseType.self)
             .result
 

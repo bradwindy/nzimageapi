@@ -11,19 +11,28 @@ import OrderedCollections
 class DigitalNZAPIDataSource {
     // MARK: Lifecycle
 
-    init(requestManager: RequestManager, collectionWeights: OrderedDictionary<String, Double>) {
+    init(requestManager: ValidatedRequestManager, collectionWeights: OrderedDictionary<String, Double>) {
         self.requestManager = requestManager
         self.collectionWeights = collectionWeights
     }
 
     // MARK: Internal
 
-    enum DigitalNZAPIDataSourceError: Error {
-        case noResults
+    struct DigitalNZAPIDataSourceError: RichError {
+        typealias ErrorKind = DigitalNZAPIDataSourceErrorKind
+
+        enum DigitalNZAPIDataSourceErrorKind {
+            case noResults
+            case non200StatusCode
+            case nonJsonResponse
+        }
+
+        var kind: DigitalNZAPIDataSourceErrorKind
+        var data: [String: Any?]
     }
 
     func newResult() async throws -> NZRecordsResult {
-        let collection = self.collectionWeights.weightedRandomPick()
+        let collection = collectionWeights.weightedRandomPick()
         let secondRequestResultsPerPage = 100
         let endpoint = "https://api.digitalnz.org/records.json"
         let apiKey: String? = nil
@@ -35,7 +44,8 @@ class DigitalNZAPIDataSource {
 
         let initialResponse: NZRecordsResponse = try await requestManager.makeRequest(endpoint: endpoint,
                                                                                       apiKey: apiKey,
-                                                                                      parameters: initialRequestParameters)
+                                                                                      parameters: initialRequestParameters,
+                                                                                      validation: validation)
 
         let validatedResultCount = try initialResponse
             .checkNonNull()
@@ -45,7 +55,7 @@ class DigitalNZAPIDataSource {
 
         let pageCount = validatedResultCount / secondRequestResultsPerPage
 
-        guard pageCount > 0 else { throw DigitalNZAPIDataSourceError.noResults }
+        guard pageCount > 0 else { throw DigitalNZAPIDataSourceError(kind: .noResults, data: ["initial response": initialResponse]) }
 
         let pageNumber = Int.random(in: 1 ... pageCount)
 
@@ -56,7 +66,8 @@ class DigitalNZAPIDataSource {
 
         let secondaryResponse: NZRecordsResponse = try await requestManager.makeRequest(endpoint: endpoint,
                                                                                         apiKey: apiKey,
-                                                                                        parameters: secondaryRequestParameters)
+                                                                                        parameters: secondaryRequestParameters,
+                                                                                        validation: validation)
 
         let validatedSearch = try secondaryResponse.checkNonNull().search!.checkNonNull()
 
@@ -70,6 +81,19 @@ class DigitalNZAPIDataSource {
 
     // MARK: Private
 
-    private let requestManager: RequestManager
+    private let validation: (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error> = { request, response, data in
+        let acceptableStatusCodes = 200 ..< 300
+
+        guard acceptableStatusCodes.contains(response.statusCode) else { return .failure(DigitalNZAPIDataSourceError(kind: .non200StatusCode, data: ["request": request,
+                                                                                                                                                     "response": response,
+                                                                                                                                                     "data": data])) }
+        
+        guard response.mimeType == "application/json" else { return .failure(DigitalNZAPIDataSourceError(kind: .nonJsonResponse, data: ["request": request,
+                                                                                                                                        "response": response,
+                                                                                                                                        "data": data])) }
+        return .success(())
+    }
+
+    private let requestManager: ValidatedRequestManager
     private let collectionWeights: OrderedDictionary<String, Double>
 }
