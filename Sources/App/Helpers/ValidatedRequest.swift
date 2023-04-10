@@ -1,6 +1,6 @@
 //
 //  ValidatedRequest.swift
-//
+//  NZImage
 //
 //  Created by Bradley Windybank on 26/03/23.
 //
