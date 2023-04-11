@@ -23,8 +23,6 @@ class DigitalNZAPIDataSource {
 
         enum DigitalNZAPIDataSourceErrorKind {
             case noResults
-            case non200StatusCode
-            case nonJsonResponse
         }
 
         var kind: DigitalNZAPIDataSourceErrorKind
