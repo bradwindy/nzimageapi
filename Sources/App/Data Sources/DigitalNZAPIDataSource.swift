@@ -44,8 +44,7 @@ class DigitalNZAPIDataSource {
 
         let initialResponse: NZRecordsResponse = try await requestManager.makeRequest(endpoint: endpoint,
                                                                                       apiKey: apiKey,
-                                                                                      parameters: initialRequestParameters,
-                                                                                      validation: validation)
+                                                                                      parameters: initialRequestParameters)
 
         let validatedResultCount = try initialResponse
             .checkNonNull()
@@ -66,8 +65,7 @@ class DigitalNZAPIDataSource {
 
         let secondaryResponse: NZRecordsResponse = try await requestManager.makeRequest(endpoint: endpoint,
                                                                                         apiKey: apiKey,
-                                                                                        parameters: secondaryRequestParameters,
-                                                                                        validation: validation)
+                                                                                        parameters: secondaryRequestParameters)
 
         let validatedSearch = try secondaryResponse.checkNonNull().search!.checkNonNull()
 
@@ -80,19 +78,6 @@ class DigitalNZAPIDataSource {
     }
 
     // MARK: Private
-
-    private let validation: (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error> = { request, response, data in
-        let acceptableStatusCodes = 200 ..< 300
-
-        guard acceptableStatusCodes.contains(response.statusCode) else { return .failure(DigitalNZAPIDataSourceError(kind: .non200StatusCode, data: ["request": request,
-                                                                                                                                                     "response": response,
-                                                                                                                                                     "data": data])) }
-        
-        guard response.mimeType == "application/json" else { return .failure(DigitalNZAPIDataSourceError(kind: .nonJsonResponse, data: ["request": request,
-                                                                                                                                        "response": response,
-                                                                                                                                        "data": data])) }
-        return .success(())
-    }
 
     private let requestManager: ValidatedRequestManager
     private let collectionWeights: OrderedDictionary<String, Double>

@@ -34,7 +34,7 @@ let collectionWeights: OrderedDictionary = ["Auckland Libraries Heritage Images 
                                             "Otago University Research Heritage": 0.0028,
                                             "Sarjeant Gallery Te Whare o Rehua Whanganui": 0.0026]
 
-let requestManager = ValidatedRequestManager()
+let requestManager = NetworkRequestManager()
 
 let digitalNZAPIDataSource = DigitalNZAPIDataSource(requestManager: requestManager, collectionWeights: collectionWeights)
 

@@ -9,7 +9,32 @@ import Alamofire
 import Foundation
 
 class NetworkRequestManager: ValidatedRequestManager {
-    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil, validation: @escaping (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error>) async throws -> ResponseType {
+    struct NetworkRequestManagerError: RichError {
+        typealias ErrorKind = NetworkRequestManagerErrorKind
+
+        enum NetworkRequestManagerErrorKind {
+            case non200StatusCode
+            case nonJsonResponse
+        }
+
+        var kind: NetworkRequestManagerErrorKind
+        var data: [String: Any?]
+    }
+
+    var validation: (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error> = { request, response, data in
+        let acceptableStatusCodes = 200 ..< 300
+
+        guard acceptableStatusCodes.contains(response.statusCode) else { return .failure(NetworkRequestManagerError(kind: .non200StatusCode, data: ["request": request,
+                                                                                                                                                    "response": response,
+                                                                                                                                                    "data": data])) }
+
+        guard response.mimeType == "application/json" else { return .failure(NetworkRequestManagerError(kind: .nonJsonResponse, data: ["request": request,
+                                                                                                                                       "response": response,
+                                                                                                                                       "data": data])) }
+        return .success(())
+    }
+
+    func makeRequest<ResponseType: NonNullableResult>(endpoint: String, apiKey: String? = nil, parameters: [String: Any]? = nil) async throws -> ResponseType {
         var headers: HTTPHeaders? = nil
 
         if let apiKey {
