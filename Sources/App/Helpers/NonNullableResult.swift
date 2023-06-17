@@ -9,9 +9,10 @@
 protocol NonNullableResult: Decodable {
     /// Result must provide error type
     associatedtype ErrorType: NonNullableError
-    
+
     /// Should be used to check to see if properties are not null.
     func checkNonNull() throws -> Self
+    func customDescription() -> String
 }
 
 /// An error thown by `NonNullableResult` when one of its properties are null.

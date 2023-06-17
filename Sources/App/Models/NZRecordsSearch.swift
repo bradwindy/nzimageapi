@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NZRecordsSearch: NonNullableResult, Decodable {
+struct NZRecordsSearch: NonNullableResult {
     // MARK: Lifecycle
 
     init(resultCount: Int?, results: [NZRecordsResult]?) {
@@ -35,6 +35,13 @@ struct NZRecordsSearch: NonNullableResult, Decodable {
 
     var resultCount: Int?
     var results: [NZRecordsResult]?
+
+    func customDescription() -> String {
+        guard let results = results else { return "NZRecordsSearch with result count \(String(describing: resultCount)), no results." }
+        let resultsString = results.map { $0.customDescription() }.joined(by: ", ")
+
+        return "NZRecordsSearch with result count \(String(describing: resultCount)), results: \(resultsString)"
+    }
 
     func checkNonNull() throws -> NZRecordsSearch {
         if resultCount != nil, results != nil {

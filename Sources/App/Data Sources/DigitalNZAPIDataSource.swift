@@ -7,6 +7,7 @@
 
 import Foundation
 import OrderedCollections
+import RichError
 
 class DigitalNZAPIDataSource {
     // MARK: Lifecycle
@@ -21,12 +22,12 @@ class DigitalNZAPIDataSource {
     struct DigitalNZAPIDataSourceError: RichError {
         typealias ErrorKind = DigitalNZAPIDataSourceErrorKind
 
-        enum DigitalNZAPIDataSourceErrorKind {
+        enum DigitalNZAPIDataSourceErrorKind: String {
             case noResults
         }
 
         var kind: DigitalNZAPIDataSourceErrorKind
-        var data: [String: Any?]
+        var data: [String: String]
     }
 
     func newResult() async throws -> NZRecordsResult {
@@ -52,7 +53,7 @@ class DigitalNZAPIDataSource {
 
         let pageCount = validatedResultCount / secondRequestResultsPerPage
 
-        guard pageCount > 0 else { throw DigitalNZAPIDataSourceError(kind: .noResults, data: ["initial response": initialResponse]) }
+        guard pageCount > 0 else { throw DigitalNZAPIDataSourceError(kind: .noResults, data: ["initial response": initialResponse.customDescription()]) }
 
         let pageNumber = Int.random(in: 1 ... pageCount)
 

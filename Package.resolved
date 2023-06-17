@@ -46,6 +46,15 @@
       }
     },
     {
+      "identity" : "richerror",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bradwindy/RichError.git",
+      "state" : {
+        "revision" : "fe5ecadfe236edf593e22bdaa35d8887480ea57d",
+        "version" : "2.0.0"
+      }
+    },
+    {
       "identity" : "routing-kit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/vapor/routing-kit.git",

@@ -5,7 +5,7 @@
 //  Created by Bradley Windybank on 22/03/23.
 //
 
-struct NZRecordsResponse: NonNullableResult, Decodable {
+struct NZRecordsResponse: NonNullableResult {
     // MARK: Lifecycle
 
     init(search: NZRecordsSearch?) {
@@ -30,6 +30,10 @@ struct NZRecordsResponse: NonNullableResult, Decodable {
     }
 
     var search: NZRecordsSearch?
+
+    func customDescription() -> String {
+        return "NZRecordsResponse with search \(String(describing: search?.customDescription()))"
+    }
 
     func checkNonNull() throws -> NZRecordsResponse {
         if search != nil {

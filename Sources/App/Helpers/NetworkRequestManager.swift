@@ -1,5 +1,5 @@
 //
-//  ValidatedRequest.swift
+//  NetworkRequestManager.swift
 //  NZImage
 //
 //  Created by Bradley Windybank on 26/03/23.
@@ -7,30 +7,31 @@
 
 import Alamofire
 import Foundation
+import RichError
 
 class NetworkRequestManager: ValidatedRequestManager {
     struct NetworkRequestManagerError: RichError {
         typealias ErrorKind = NetworkRequestManagerErrorKind
 
-        enum NetworkRequestManagerErrorKind {
+        enum NetworkRequestManagerErrorKind: String {
             case non200StatusCode
             case nonJsonResponse
         }
 
         var kind: NetworkRequestManagerErrorKind
-        var data: [String: Any?]
+        var data: [String: String]
     }
 
     var validation: (URLRequest?, HTTPURLResponse, Data?) -> Result<Void, Error> = { request, response, data in
         let acceptableStatusCodes = 200 ..< 300
 
-        guard acceptableStatusCodes.contains(response.statusCode) else { return .failure(NetworkRequestManagerError(kind: .non200StatusCode, data: ["request": request,
-                                                                                                                                                    "response": response,
-                                                                                                                                                    "data": data])) }
+        let errorData: [String: String] = ["request": request?.description ?? "nil request",
+                                           "response": response.description,
+                                           "data": data?.description ?? "nil data"]
 
-        guard response.mimeType == "application/json" else { return .failure(NetworkRequestManagerError(kind: .nonJsonResponse, data: ["request": request,
-                                                                                                                                       "response": response,
-                                                                                                                                       "data": data])) }
+        guard acceptableStatusCodes.contains(response.statusCode) else { return .failure(NetworkRequestManagerError(kind: .non200StatusCode, data: errorData)) }
+
+        guard response.mimeType == "application/json" else { return .failure(NetworkRequestManagerError(kind: .nonJsonResponse, data: errorData)) }
         return .success(())
     }
 

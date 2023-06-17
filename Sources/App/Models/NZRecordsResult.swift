@@ -52,6 +52,17 @@ struct NZRecordsResult: NonNullableResult, Content {
     var largeThumbnailUrl: URL?
     var collection: String?
 
+    func customDescription() -> String {
+        return """
+        NZRecordsResult with id: \(String(describing: id)),
+        title: \(String(describing: title)),
+        description: \(String(describing: description)),
+        thumbnailUrl: \(String(describing: thumbnailUrl)),
+        largeThumbnailUrl: \(String(describing: largeThumbnailUrl)),
+        collection: \(String(describing: collection))
+        """
+    }
+
     func checkNonNull() throws -> NZRecordsResult {
         if id != nil, title != nil, description != nil, thumbnailUrl != nil, largeThumbnailUrl != nil {
             return self
